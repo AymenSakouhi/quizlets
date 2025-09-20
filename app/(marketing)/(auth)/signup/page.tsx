@@ -1,5 +1,14 @@
-import { SignUpForm } from "@/components/signup-form";
+import { SignUpForm } from '@/components/signup-form'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 
-export default function Page() {
-  return <SignUpForm />;
+export default async function Page() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (session?.user) redirect('/dashboard')
+
+  return <SignUpForm />
 }
