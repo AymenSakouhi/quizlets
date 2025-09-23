@@ -2,9 +2,9 @@ import { z } from 'zod'
 
 export const signUpSchema = z
   .object({
-    name: z.string(),
+    name: z.string().min(2, 'Minimum 2 characters'),
     email: z.email({
-      message: 'This should be a valid emai',
+      message: 'This should be a valid email',
     }),
     password: z.string().min(8, {
       message: 'Minimum 8 characters',
@@ -12,7 +12,7 @@ export const signUpSchema = z
     repeatedPassword: z.string(),
   })
   .refine((data) => data.password === data.repeatedPassword, {
-    message: '',
+    message: 'Passwords are not identical',
     path: ['repeatedPassword'],
   })
 

@@ -4,7 +4,7 @@ export const authclient = createAuthClient({
   baseURL: process.env.BETTER_AUTH_URL,
 })
 
-export const { signIn, signUp, signOut } = authclient
+export const { signIn, signUp, signOut, useSession } = authclient
 
 export const githubSignIn = async () => {
   await signIn.social({

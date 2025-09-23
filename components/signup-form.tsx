@@ -34,14 +34,17 @@ export function SignUpForm({
     resolver: zodResolver(signUpSchema),
   })
 
-  const onSubmit = async (data: signUpSchemaType) => {
-    alert(JSON.stringify(data))
-    await signUp.email({
-      name: 'Aymen',
-      email: data.email,
-      password: data.password,
-      callbackURL: '/signIn',
+  const onSubmit = ({ name, email, password }: signUpSchemaType) => {
+    const userData = {
+      name,
+      email,
+      password,
+    }
+    signUp.email({
+      ...userData,
+      callbackURL: '/signin',
     })
+    alert(JSON.stringify(userData))
   }
 
   return (
@@ -54,6 +57,27 @@ export function SignUpForm({
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
+              <div className="grid gap-3">
+                <Label htmlFor="name">Name</Label>
+                <Controller
+                  name="name"
+                  control={control}
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field }) => (
+                    <Input
+                      id="name"
+                      type="name"
+                      placeholder="John"
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.name && (
+                  <span className="text-red-700">{errors.name?.message}</span>
+                )}
+              </div>
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
                 <Controller
@@ -71,6 +95,9 @@ export function SignUpForm({
                     />
                   )}
                 />
+                {errors.email && (
+                  <span className="text-red-700">{errors.email?.message}</span>
+                )}
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
@@ -86,6 +113,11 @@ export function SignUpForm({
                     <Input id="password" type="password" {...field} />
                   )}
                 />
+                {errors.password && (
+                  <span className="text-red-700">
+                    {errors.password?.message}
+                  </span>
+                )}
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
@@ -101,6 +133,11 @@ export function SignUpForm({
                     <Input id="repeatedPassword" type="password" {...field} />
                   )}
                 />
+                {errors.repeatedPassword && (
+                  <span className="text-red-700">
+                    {errors.repeatedPassword?.message}
+                  </span>
+                )}
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
