@@ -1,3 +1,5 @@
+'use client'
+
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -9,11 +11,35 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { signInSchema, SignInSchemaType } from '@/types/types'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { githubSignIn, signIn } from '@/lib/auth-client'
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    resolver: zodResolver(signInSchema),
+  })
+
+  const onSubmit = async ({ email, password }: SignInSchemaType) => {
+    await signIn.email({
+      email,
+      password,
+      callbackURL: '/dashboard',
+    })
+  }
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
@@ -24,17 +50,29 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
+                <Controller
+                  name="email"
+                  control={control}
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field }) => (
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="m@example.com"
+                      {...field}
+                    />
+                  )}
                 />
               </div>
+              {errors?.email && (
+                <span className="text-red-700">{errors.email?.message}</span>
+              )}
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password</Label>
@@ -45,14 +83,39 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Controller
+                  name="password"
+                  control={control}
+                  rules={{
+                    required: true,
+                  }}
+                  render={({ field }) => (
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Password!"
+                      {...field}
+                    />
+                  )}
+                />
+                {errors?.password && (
+                  <span className="text-red-700">
+                    {errors.password.message}
+                  </span>
+                )}
               </div>
               <div className="flex flex-col gap-3">
                 <Button type="submit" className="w-full">
                   Login
                 </Button>
-                <Button variant="outline" className="w-full">
-                  Login with Google
+                <Button
+                  onClick={async () => {
+                    await githubSignIn()
+                  }}
+                  variant="outline"
+                  className="w-full"
+                >
+                  Login with Github
                 </Button>
               </div>
             </div>

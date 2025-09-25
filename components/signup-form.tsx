@@ -12,7 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { signUp, githubSignIn } from '@/lib/auth-client'
-import { signUpSchema, signUpSchemaType } from '@/types/types'
+import { signUpSchema, SignUpSchemaType } from '@/types/types'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, Controller } from 'react-hook-form'
 
@@ -34,7 +34,7 @@ export function SignUpForm({
     resolver: zodResolver(signUpSchema),
   })
 
-  const onSubmit = ({ name, email, password }: signUpSchemaType) => {
+  const onSubmit = ({ name, email, password }: SignUpSchemaType) => {
     const userData = {
       name,
       email,
@@ -44,7 +44,6 @@ export function SignUpForm({
       ...userData,
       callbackURL: '/signin',
     })
-    alert(JSON.stringify(userData))
   }
 
   return (
@@ -144,8 +143,8 @@ export function SignUpForm({
                   Sign up
                 </Button>
                 <Button
-                  onClick={() => {
-                    githubSignIn()
+                  onClick={async () => {
+                    await githubSignIn()
                   }}
                   variant="outline"
                   className="w-full"
